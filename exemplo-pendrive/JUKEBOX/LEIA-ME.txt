@@ -1,0 +1,5 @@
+Esta pasta JUKEBOX vai na RAIZ do pendrive (ou numa particao com o nome JUKEBOX).
+  musicas/  -> uma pasta por cantor, com os arquivos de musica dentro
+  imagem/   -> capas com o nome do cantor (ex.: Mastruz Com Leite.jpg)
+  som/      -> (opcional) credito.mp3
+Copie aqui as suas pastas "músicas" e "imagem" do Windows.

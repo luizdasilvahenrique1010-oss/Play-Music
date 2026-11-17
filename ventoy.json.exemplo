@@ -1,0 +1,7 @@
+{
+  "control": [
+    { "VTOY_DEFAULT_SEARCH_ROOT": "/" },
+    { "VTOY_DEFAULT_IMAGE": "/jukebox.iso" },
+    { "VTOY_MENU_TIMEOUT": "3" }
+  ]
+}

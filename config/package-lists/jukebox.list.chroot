@@ -1,0 +1,51 @@
+# --- Tela / navegador ---
+xserver-xorg
+xserver-xorg-legacy
+xserver-xorg-input-libinput
+xinit
+x11-xserver-utils
+openbox
+chromium
+fonts-dejavu
+fonts-liberation
+fonts-noto-color-emoji
+
+# --- DRIVERS DE VÍDEO (Intel, AMD, NVIDIA/nouveau, VMware, etc.) ---
+xserver-xorg-video-all
+libgl1-mesa-dri
+libglx-mesa0
+mesa-vulkan-drivers
+mesa-va-drivers
+intel-media-va-driver
+va-driver-all
+firmware-linux
+firmware-linux-free
+firmware-linux-nonfree
+firmware-misc-nonfree
+firmware-amd-graphics
+firmware-intel-graphics
+amd64-microcode
+intel-microcode
+
+# --- DRIVERS DE SOM (placas comuns, HDMI, Intel SOF, USB) ---
+pipewire
+pipewire-audio
+pipewire-alsa
+wireplumber
+alsa-utils
+alsa-ucm-conf
+firmware-sof-signed
+firmware-intel-misc
+firmware-realtek
+dbus-user-session
+libpam-systemd
+
+# --- Pendrive / discos (exFAT, NTFS, FAT, ext4) ---
+ntfs-3g
+exfatprogs
+dosfstools
+e2fsprogs
+util-linux
+python3-minimal
+sudo
+procps

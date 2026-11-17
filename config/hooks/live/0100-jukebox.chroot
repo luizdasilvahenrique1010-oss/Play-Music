@@ -1,0 +1,5 @@
+#!/bin/sh
+# Liga o serviço que acha o pendrive e liga o som (PipeWire) para o usuário.
+systemctl enable jukebox-dados.service || true
+systemctl --global enable pipewire.socket pipewire-pulse.socket wireplumber.service || true
+exit 0

@@ -1,0 +1,64 @@
+#!/bin/bash
+# Procura um disco/pendrive que tenha:
+#   (a) uma particao com o nome (label) JUKEBOX, ou
+#   (b) uma pasta chamada JUKEBOX na raiz (ex.: pendrive do Ventoy).
+# Dentro dela ficam as pastas "musicas" e "imagem" (e opcionalmente "som").
+RUN=/run/jukebox
+MNT=/media/jukebox-dados
+UID_USER=1000
+mkdir -p "$RUN" "$MNT"
+rm -f "$RUN"/* 2>/dev/null
+
+montar() {  # $1=dispositivo $2=tipo
+  local dev="$1" t="$2" o
+  case "$t" in
+    vfat)  o="uid=$UID_USER,gid=$UID_USER,umask=0000,iocharset=utf8"
+           mount -t vfat -o "rw,$o" "$dev" "$MNT" 2>/dev/null || mount -t vfat -o "ro,$o" "$dev" "$MNT" 2>/dev/null ;;
+    exfat) o="uid=$UID_USER,gid=$UID_USER,umask=0000"
+           mount -t exfat -o "rw,$o" "$dev" "$MNT" 2>/dev/null || mount -t exfat -o "ro,$o" "$dev" "$MNT" 2>/dev/null ;;
+    ntfs)  o="uid=$UID_USER,gid=$UID_USER,umask=0000"
+           mount -t ntfs-3g -o "rw,$o" "$dev" "$MNT" 2>/dev/null || mount -t ntfs-3g -o "ro,$o" "$dev" "$MNT" 2>/dev/null ;;
+    ext2|ext3|ext4) mount -o rw "$dev" "$MNT" 2>/dev/null || mount -o ro "$dev" "$MNT" 2>/dev/null ;;
+    *) return 1 ;;
+  esac
+}
+
+BASE=""
+for tentativa in $(seq 1 60); do
+  udevadm settle -t 2 2>/dev/null
+  for dev in $(lsblk -rpno NAME,TYPE 2>/dev/null | awk '$2=="part"{print $1}'); do
+    fs=$(blkid -o value -s TYPE "$dev" 2>/dev/null)
+    label=$(blkid -o value -s LABEL "$dev" 2>/dev/null)
+    case "$fs" in vfat|exfat|ntfs|ext2|ext3|ext4) ;; *) continue ;; esac
+    # nao mexer em particao ja montada pelo sistema
+    if findmnt -n -S "$dev" >/dev/null 2>&1; then continue; fi
+    montar "$dev" "$fs" || continue
+    if [ "${label^^}" = "JUKEBOX" ]; then BASE="$MNT"; break 2; fi
+    pasta=$(find "$MNT" -maxdepth 1 -mindepth 1 -type d -iname jukebox 2>/dev/null | head -n1)
+    if [ -n "$pasta" ]; then BASE="$pasta"; break 2; fi
+    umount "$MNT" 2>/dev/null
+  done
+  sleep 1
+done
+
+if [ -z "$BASE" ]; then
+  cat > "$RUN/index.html" <<'HTML'
+<!doctype html><meta charset="utf-8"><body style="background:#150c05;color:#fff;font-family:Arial;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;text-align:center">
+<div><h1 style="color:#ffe600">Jukebox</h1><p style="font-size:24px">Nenhum pendrive/disco com a pasta <b>JUKEBOX</b> foi encontrado.</p>
+<p style="font-size:18px;color:#9fc4ff">Coloque a pasta JUKEBOX (com "músicas" e "imagem") no pendrive e reinicie o computador.</p></div>
+HTML
+  touch "$RUN/pronto"; exit 0
+fi
+
+# atalhos para as pastas do pendrive dentro de /run/jukebox
+for item in "$BASE"/*; do
+  nome=$(basename "$item")
+  case "$nome" in index.html|biblioteca.js|*.bat|*.ps1|*.txt) continue ;; esac
+  ln -sfn "$item" "$RUN/$nome"
+done
+# index.html: usa o do pendrive, se existir (assim da para atualizar sem refazer a ISO)
+if [ -f "$BASE/index.html" ]; then cp "$BASE/index.html" "$RUN/index.html"; else cp /opt/jukebox/index.html "$RUN/index.html"; fi
+# lista de musicas (equivalente ao atualizar.ps1 do Windows)
+python3 /usr/local/bin/jukebox-lista.py "$BASE" "$RUN/biblioteca.js"
+touch "$RUN/pronto"
+exit 0

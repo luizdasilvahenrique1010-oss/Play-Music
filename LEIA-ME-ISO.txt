@@ -1,0 +1,50 @@
+JUKEBOX EM PENDRIVE (LINUX) - COMO USAR
+=======================================
+
+O QUE E ISSO
+  Arquivos para montar uma ISO de Linux que liga direto no Jukebox, em tela cheia,
+  com drivers de SOM e de VIDEO incluidos (Intel, AMD, NVIDIA/nouveau, HDMI, placas
+  de som comuns). As suas musicas e imagens ficam numa pasta JUKEBOX no pendrive.
+
+PASSO 1 - MONTAR A ISO (so uma vez)
+  Precisa de um Linux DEBIAN (pode ser um PC, ou uma maquina virtual no VirtualBox
+  com Debian 13), com internet e uns 15 GB livres.
+  1) Copie esta pasta inteira (jukebox-iso) para dentro do Debian.
+  2) Abra o terminal dentro da pasta e rode:
+        sudo ./build.sh
+     (se o seu Debian for o 12, rode:  sudo ./build.sh bookworm)
+  3) Espere (20 a 60 minutos). No fim aparece o arquivo  jukebox.iso
+  Se der erro, o arquivo build.log mostra o motivo. O erro mais comum e um nome de
+  pacote que nao existe naquela versao: apague essa linha em
+  config/package-lists/jukebox.list.chroot e rode de novo.
+
+PASSO 2 - PREPARAR O PENDRIVE (recomendado: Ventoy)
+  1) Instale o Ventoy no pendrive (ventoy.net). Ele cria a particao grande.
+  2) Copie para o pendrive:
+        - o arquivo jukebox.iso
+        - a pasta JUKEBOX  (veja a pasta "exemplo-pendrive")
+  3) Dentro de JUKEBOX coloque:
+        musicas/   -> uma pasta por cantor, com os arquivos de musica (igual no Windows)
+        imagem/    -> as capas, com o nome do cantor
+        som/       -> (opcional) credito.mp3 = som da moeda
+  4) (opcional) Para entrar sozinho no jukebox sem escolher nada no menu, crie no
+     pendrive o arquivo  ventoy/ventoy.json  com o conteudo do arquivo
+     "ventoy.json.exemplo" que esta nesta pasta.
+
+  Outra opcao: um segundo pendrive/HD formatado (exFAT, NTFS ou ext4) com o NOME
+  (label) JUKEBOX, e as pastas musicas e imagem dentro dele.
+
+PASSO 3 - LIGAR
+  Ligue o computador pelo pendrive (tecla de boot: F12, F8, F11, Esc ou Del).
+  Ele abre o Jukebox sozinho. Para musicas novas: coloque a pasta no pendrive e
+  reinicie o computador (a lista e refeita a cada vez que liga).
+
+IMPORTANTE
+  - Desligue o "Secure Boot" na BIOS (a ISO nao e assinada).
+  - Funciona em BIOS antiga e em UEFI.
+  - NVIDIA: usa o driver livre (nouveau); funciona, mas o desempenho e basico.
+  - Credito e configuracoes voltam ao padrao (R$ 2,00 = 3 musicas) quando o
+    computador reinicia.
+  - Para atualizar o jukebox sem refazer a ISO: ponha um index.html novo dentro da
+    pasta JUKEBOX do pendrive. Ele tem prioridade sobre o da ISO.
+  - Usuario do sistema (se precisar): user / senha: live
